@@ -40,6 +40,16 @@ var dict = {
 
   };
 
+  var chords = {
+    'a': 'a',
+    'b': 'b',
+    'c': 'c',
+    'd': 'd',
+    'e': 'e',
+    'f': 'f',
+    'g': 'g'
+  };
+
   var durations = {
     1: ['1'],
     2: ['2','2'],
@@ -93,17 +103,25 @@ function create(str){
   bassNotes= [];
   
 
-  var arr = parseString(str);
+  var noteArr = parseString(str);
   var index = 0;
-  arr.forEach(function(note){
 
-    var duration = durations[str.length];
-    duration = shuffle(duration);
+  var duration = durations[str.length];
+  duration = shuffle(duration);
 
-    var note = note.concat("/4");    
+  var bassduration = shuffle(duration);
 
-    notes.push(new VF.StaveNote({clef: "treble", keys: [note], duration: duration[index++]}))
+  noteArr.forEach(function(n){
+
+    var note = n.concat("/4");    
+    var bassnote = n.concat("/4");
+
+    notes.push(new VF.StaveNote({clef: "treble", keys: [note], duration: duration[index]}));
+    bassNotes.push(new Vex.Flow.StaveNote({ keys: [bassnote], duration:  bassduration[index]}));
+    index++;
   });   
+
+  bassNotes = shuffle(bassNotes);
 
   generateMusic();
 }
@@ -117,7 +135,7 @@ $("#submit_button").on("click", function(){
 
 //starting music notes
 function startUp(){
-  create('Maryland');
+  create('Music');
 }
 
 function clearStaffs(){
@@ -165,13 +183,8 @@ function generateMusic(){
   bassBar.setEndBarType(Vex.Flow.Barline.type.END);
 
   bassBar.addClef("bass").addTimeSignature("4/4").setContext(context).draw();
-  
-  var bassNotes = [
-    new Vex.Flow.StaveNote({ keys: ["c/4", "e/4", "g/4"], duration: "2" }),
-    new Vex.Flow.StaveNote({ keys: ["c/4", "e/4", "g/4"], duration: "2" }),
-  ]
 
-  var beams = VF.Beam.generateBeams(trebleNotes);
+  var beams = VF.Beam.generateBeams(bassNotes);
   Vex.Flow.Formatter.FormatAndDraw(context, bassBar, bassNotes);
   beams.forEach(function(b) {b.setContext(context).draw()});
 
